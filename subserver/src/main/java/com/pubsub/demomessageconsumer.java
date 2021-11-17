@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.example.pubsub;
+package com.pubsub;
 
 import java.util.concurrent.CountDownLatch;
 
