@@ -40,7 +40,7 @@ public class pubserver {
             final String msg = "Hello World";
             final JCSMPSession session = solaceFactory.createSession();
 
-            //XMLMessageConsumer cons = session.getMessageConsumer(msgConsumer);
+            XMLMessageConsumer cons = session.getMessageConsumer(msgConsumer);
             //adds a subscription to the appliance.
             session.addSubscription(topic);
             log.info("Connected. Awaiting message...");
