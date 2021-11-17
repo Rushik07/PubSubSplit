@@ -66,7 +66,7 @@ public class clientserver{
             //keeps copy until successfully deliverd.
             //jcsmpMsg.setDeliveryMode(DeliveryMode.PERSISTENT);
 
-            /*
+           /*
             log.info("============= Sending " + msg);
             prod.send(jcsmpMsg, topic);
             */
