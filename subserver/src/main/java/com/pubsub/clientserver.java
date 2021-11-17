@@ -79,7 +79,7 @@ public class clientserver{
             // Close consumer
             cons.close();
             log.info("Exiting.");
-            
+            session.closeSession();
         }
     }
 
