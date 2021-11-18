@@ -40,7 +40,7 @@ public class PubServer {
 
             //adds a subscription to the appliance.
             session.addSubscription(topic);
-            
+
             // Consumer session is now hooked up and running!
 
             /** Anonymous inner-class for handling publishing events */
