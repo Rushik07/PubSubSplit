@@ -18,34 +18,33 @@
  */
 package com.pubsub;
 
-import java.util.concurrent.CountDownLatch;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.solacesystems.jcsmp.BytesXMLMessage;
 import com.solacesystems.jcsmp.JCSMPException;
 import com.solacesystems.jcsmp.TextMessage;
 import com.solacesystems.jcsmp.XMLMessageListener;
+import lombok.extern.apachecommons.CommonsLog;
 
-public class demomessageconsumer implements XMLMessageListener {
+import java.util.concurrent.CountDownLatch;
+
+@CommonsLog
+//XMLMessageListener is used to receive messages asynchronously.
+public class DemoMessageConsumer implements XMLMessageListener {
     //CountDownLatch here is used for thread sychronization.
     private CountDownLatch latch = new CountDownLatch(1);
     // Logging is done here.
-    private static final Logger logger = LoggerFactory.getLogger(demomessageconsumer.class);
     //BytesXMLMessage describe a messages that are sent or received.
     public void onReceive(BytesXMLMessage msg) {
         //TextMessage is used to send a meesage containing text.
         if (msg instanceof TextMessage) {
-            logger.info("============= TextMessage received: " + ((TextMessage) msg).getText());
+            log.info("============= TextMessage received: " + ((TextMessage) msg).getText());
         } else {
-            logger.info("============= Message received.");
+            log.info("============= Message received.");
         }
         latch.countDown(); // unblock main thread
     }
 
     public void onException(JCSMPException e) {
-        logger.info("Consumer received exception:", e);
+        log.info("Consumer received exception:", e);
         latch.countDown(); // unblock main thread
     }
 

@@ -1,6 +1,6 @@
 package com.pubsub;
 
-import com.example.pubsub.demomessageconsumer;
+
 import com.solace.services.core.model.SolaceServiceCredentials;
 import com.solacesystems.jcsmp.*;
 import lombok.extern.apachecommons.CommonsLog;
@@ -10,14 +10,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
-
 @SpringBootApplication
 @CommonsLog
-public class clientserver{
+public class PubServer {
 
     public static void main(String[] args) {
-        SpringApplication.run(clientserver.class, args);
+        SpringApplication.run(PubServer.class, args);
     }
 
     @Component
@@ -33,24 +31,21 @@ public class clientserver{
         @Autowired(required=false) private SolaceServiceCredentials solaceServiceCredentials;
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
-        private demomessageconsumer msgConsumer = new demomessageconsumer();
-        //private Demo_Publish_Event_Handler pubEventHandler = new Demo_Publish_Event_Handler();
+        //private Demo_Message_Consumer msgConsumer = new Demo_Message_Consumer();
+        private PubEventHandler pubEventHandler = new PubEventHandler();
 
         public void run(String... strings) throws Exception {
             final String msg = "Hello World";
             final JCSMPSession session = solaceFactory.createSession();
 
-            XMLMessageConsumer cons = session.getMessageConsumer(msgConsumer);
-            //adds a subscription to the appliance.
-            session.addSubscription(topic);
+
             log.info("Connected. Awaiting message...");
-            //start receiving message
-            cons.start();
+
 
             // Consumer session is now hooked up and running!
 
             /** Anonymous inner-class for handling publishing events */
-            //XMLMessageProducer prod = session.getMessageProducer(pubEventHandler);
+            XMLMessageProducer prod = session.getMessageProducer(pubEventHandler);
 
             // Publish-only session is now hooked up and running!
             //Creates a message instance tied to that producer.
@@ -64,22 +59,11 @@ public class clientserver{
             //sets persistent delivery mode.
             //persistent(Guaranteed message) , sends message even if receiver is offline.
             //keeps copy until successfully deliverd.
-            //jcsmpMsg.setDeliveryMode(DeliveryMode.PERSISTENT);
+            jcsmpMsg.setDeliveryMode(DeliveryMode.PERSISTENT);
 
-           /*
             log.info("============= Sending " + msg);
             prod.send(jcsmpMsg, topic);
-            */
-            try {
-                // block here until message received, and latch will flip.
-                msgConsumer.getLatch().await(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                log.error("I was awoken while waiting``");
-            }
-            // Close consumer
-            cons.close();
-            log.info("Exiting.");
-            session.closeSession();
+
         }
     }
 
