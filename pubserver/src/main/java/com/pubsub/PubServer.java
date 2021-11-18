@@ -10,14 +10,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
-
 @SpringBootApplication
 @CommonsLog
-public class pubserver {
+public class PubServer {
 
     public static void main(String[] args) {
-        SpringApplication.run(pubserver.class, args);
+        SpringApplication.run(PubServer.class, args);
     }
 
     @Component
@@ -34,19 +32,15 @@ public class pubserver {
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
         //private Demo_Message_Consumer msgConsumer = new Demo_Message_Consumer();
-        private pubeventhandler pubEventHandler = new pubeventhandler();
+        private PubEventHandler pubEventHandler = new PubEventHandler();
 
         public void run(String... strings) throws Exception {
             final String msg = "Hello World";
             final JCSMPSession session = solaceFactory.createSession();
 
-            XMLMessageConsumer cons = session.getMessageConsumer(msgConsumer);
             //adds a subscription to the appliance.
             session.addSubscription(topic);
-            log.info("Connected. Awaiting message...");
-            //start receiving message
-            //cons.start();
-
+            
             // Consumer session is now hooked up and running!
 
             /** Anonymous inner-class for handling publishing events */
@@ -69,19 +63,6 @@ public class pubserver {
             log.info("============= Sending " + msg);
             prod.send(jcsmpMsg, topic);
 
-            /*
-            try {
-                // block here until message received, and latch will flip.
-                msgConsumer.getLatch().await(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                log.error("I was awoken while waiting``");
-            }
-
-            // Close consumer
-            cons.close();
-            log.info("Exiting.");
-            session.closeSession();
-             */
         }
     }
 
