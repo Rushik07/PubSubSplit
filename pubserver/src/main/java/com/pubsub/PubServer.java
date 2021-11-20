@@ -10,6 +10,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 @SpringBootApplication
 @CommonsLog
 public class PubServer {
@@ -35,7 +38,9 @@ public class PubServer {
         private PubEventHandler pubEventHandler = new PubEventHandler();
 
         public void run(String... strings) throws Exception {
-            final String msg = "Hello World";
+            //we can write java code here to read msg line after line from file and  store it in our String msg.
+
+            //final String msg = "Hello World";
             final JCSMPSession session = solaceFactory.createSession();
 
             //adds a subscription to the appliance.
@@ -51,17 +56,24 @@ public class PubServer {
 
             TextMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
 
+            BufferedReader br = new BufferedReader(new FileReader( "C:\\Users\\Rshkpatel\\Desktop\\demo.txt"));
+            String msg;
+            while((msg=br.readLine()) != null){
+                jcsmpMsg.setText(msg);
+                log.info("============= Sending " + msg);
+                prod.send(jcsmpMsg, topic);
+            }
+            br.close();
             //sets message content.
-
-            jcsmpMsg.setText(msg);
+            //jcsmpMsg.setText(msg);
 
             //sets persistent delivery mode.
             //persistent(Guaranteed message) , sends message even if receiver is offline.
             //keeps copy until successfully deliverd.
             jcsmpMsg.setDeliveryMode(DeliveryMode.PERSISTENT);
 
-            log.info("============= Sending " + msg);
-            prod.send(jcsmpMsg, topic);
+            //log.info("============= Sending " + msg);
+            //prod.send(jcsmpMsg, topic);
 
         }
     }

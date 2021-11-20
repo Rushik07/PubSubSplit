@@ -31,7 +31,6 @@ public class SubServer {
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
         private DemoMessageConsumer msgConsumer = new DemoMessageConsumer();
-        //private Demo_Publish_Event_Handler pubEventHandler = new Demo_Publish_Event_Handler();
         public void run(String... strings) throws Exception {
 
             final JCSMPSession session = solaceFactory.createSession();
@@ -42,7 +41,6 @@ public class SubServer {
             log.info("Connected. Awaiting message...");
             //start receiving message
             cons.start();
-
             // Consumer session is now hooked up and running!
 
             /** Anonymous inner-class for handling publishing events */

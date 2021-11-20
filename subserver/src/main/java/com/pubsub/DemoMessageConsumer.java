@@ -18,29 +18,33 @@
  */
 package com.pubsub;
 
-import com.solacesystems.jcsmp.BytesXMLMessage;
-import com.solacesystems.jcsmp.JCSMPException;
-import com.solacesystems.jcsmp.TextMessage;
-import com.solacesystems.jcsmp.XMLMessageListener;
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
+import com.solacesystems.jcsmp.*;
+import com.solacesystems.jcsmp.impl.JCSMPXMLMessageConsumer;
 import lombok.extern.apachecommons.CommonsLog;
 
+import java.io.*;
 import java.util.concurrent.CountDownLatch;
 
 @CommonsLog
 //XMLMessageListener is used to receive messages asynchronously.
 public class DemoMessageConsumer implements XMLMessageListener {
     //CountDownLatch here is used for thread sychronization.
-    private CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch latch = new CountDownLatch(9);
     // Logging is done here.
     //BytesXMLMessage describe a messages that are sent or received.
     public void onReceive(BytesXMLMessage msg) {
-        //TextMessage is used to send a meesage containing text.
+        //TextMessage is used to send a message containing text.
+        //Here we can have java code to write msg in a file.
+
+
         if (msg instanceof TextMessage) {
             log.info("============= TextMessage received: " + ((TextMessage) msg).getText());
         } else {
             log.info("============= Message received.");
         }
-        latch.countDown(); // unblock main thread
+
+        latch.countDown();
     }
 
     public void onException(JCSMPException e) {
