@@ -23,6 +23,7 @@ public class PubServer {
 
     @Component
     static class Runner implements CommandLineRunner {
+
         //JCMPFactory is used to obtain instances of messaging system entities. Creating topic as well.
         private final Topic topic = JCSMPFactory.onlyInstance().createTopic("tutorial/topic");
 
@@ -34,14 +35,22 @@ public class PubServer {
         @Autowired(required=false) private SolaceServiceCredentials solaceServiceCredentials;
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
+
         private PubEventHandler pubEventHandler = new PubEventHandler();
 
         public void run(String... strings) throws Exception {
-
+            final EndpointProperties endpointProps = new EndpointProperties();
+            endpointProps.setPermission(EndpointProperties.PERMISSION_CONSUME);
+            endpointProps.setAccessType(EndpointProperties.ACCESSTYPE_EXCLUSIVE);
             final JCSMPSession session = solaceFactory.createSession();
+            session.isCapable(CapabilityType.ENDPOINT_MANAGEMENT);
+            session.isCapable(CapabilityType.QUEUE_SUBSCRIPTIONS);
+            Queue queue = JCSMPFactory.onlyInstance().createQueue("DemoQueue");
 
             //adds a subscription to the appliance.
-            session.addSubscription(topic);
+            session.provision(queue, endpointProps, JCSMPSession.FLAG_IGNORE_ALREADY_EXISTS);
+
+
 
             // Consumer session is now hooked up and running!
 
@@ -58,7 +67,7 @@ public class PubServer {
             while((msg=br.readLine()) != null){
                 jcsmpMsg.setText(msg);
                 log.info("============= Sending " + msg);
-                prod.send(jcsmpMsg, topic);
+                prod.send(jcsmpMsg, queue);
             }
             br.close();
             //sets message content.
