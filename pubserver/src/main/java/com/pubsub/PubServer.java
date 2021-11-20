@@ -34,13 +34,10 @@ public class PubServer {
         @Autowired(required=false) private SolaceServiceCredentials solaceServiceCredentials;
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
-        //private Demo_Message_Consumer msgConsumer = new Demo_Message_Consumer();
         private PubEventHandler pubEventHandler = new PubEventHandler();
 
         public void run(String... strings) throws Exception {
-            //we can write java code here to read msg line after line from file and  store it in our String msg.
 
-            //final String msg = "Hello World";
             final JCSMPSession session = solaceFactory.createSession();
 
             //adds a subscription to the appliance.

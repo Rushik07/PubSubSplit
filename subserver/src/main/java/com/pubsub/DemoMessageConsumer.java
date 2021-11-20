@@ -37,7 +37,6 @@ public class DemoMessageConsumer implements XMLMessageListener {
         //TextMessage is used to send a message containing text.
         //Here we can have java code to write msg in a file.
 
-
         if (msg instanceof TextMessage) {
             log.info("============= TextMessage received: " + ((TextMessage) msg).getText());
         } else {
