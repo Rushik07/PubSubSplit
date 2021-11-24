@@ -18,11 +18,12 @@
  */
 package com.pubsub;
 
-import com.solacesystems.jcsmp.*;
-import lombok.SneakyThrows;
+import com.solacesystems.jcsmp.BytesXMLMessage;
+import com.solacesystems.jcsmp.JCSMPException;
+import com.solacesystems.jcsmp.TextMessage;
+import com.solacesystems.jcsmp.XMLMessageListener;
 import lombok.extern.apachecommons.CommonsLog;
 
-import java.io.FileOutputStream;
 import java.util.concurrent.CountDownLatch;
 
 @CommonsLog
@@ -30,24 +31,22 @@ import java.util.concurrent.CountDownLatch;
 public class DemoMessageConsumer implements XMLMessageListener {
     //CountDownLatch here is used for thread sychronization.
     private CountDownLatch latch = new CountDownLatch(9);
+
     // Logging is done here.
     //BytesXMLMessage describe a messages that are sent or received.
 
-    @SneakyThrows
     public void onReceive(BytesXMLMessage msg) {
         //TextMessage is used to send a message containing text.
         //Here we can have java code to write msg in a file.
         if (msg instanceof TextMessage) {
-            FileOutputStream fo = new FileOutputStream("C:\\Users\\Rshkpatel\\Desktop\\Subdemo.txt");
             log.info("============= TextMessage received: " + ((TextMessage) msg).getText());
-            fo.write(Integer.parseInt(((TextMessage) msg).getText()));
-            fo.close();
         } else {
             log.info("============= Message received.");
         }
-
+        msg.ackMessage();
         latch.countDown();
     }
+
 
     public void onException(JCSMPException e) {
         log.info("Consumer received exception:", e);

@@ -66,7 +66,9 @@ public class SubServer {
             } catch (InterruptedException e) {
                 log.error("I was awoken while waiting``");
             }
+            
             // Close consumer
+
             cons.close();
             log.info("Exiting.");
             session.closeSession();

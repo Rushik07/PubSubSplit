@@ -36,7 +36,7 @@ public class PubServer {
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
 
-        private PubEventHandler pubEventHandler = new PubEventHandler();
+       private PubEventHandler pubEventHandler = new PubEventHandler();
 
         public void run(String... strings) throws Exception {
 
@@ -46,17 +46,14 @@ public class PubServer {
             final EndpointProperties endpointProps = new EndpointProperties();
             endpointProps.setPermission(EndpointProperties.PERMISSION_CONSUME);
             endpointProps.setAccessType(EndpointProperties.ACCESSTYPE_EXCLUSIVE);
-            //endpointProps.setQuota(5000);
+
             session.provision(queue, endpointProps, JCSMPSession.FLAG_IGNORE_ALREADY_EXISTS);
 
             //adds a subscription to the appliance.
-            //session.addSubscription(queue, topic, JCSMPSession.FLAG_IGNORE_ALREADY_EXISTS);
-
             // Consumer session is now hooked up and running!
 
             /** Anonymous inner-class for handling publishing events */
             XMLMessageProducer prod = session.getMessageProducer(pubEventHandler);
-
             // Publish-only session is now hooked up and running!
             //Creates a message instance tied to that producer.
 
@@ -70,16 +67,11 @@ public class PubServer {
                 prod.send(jcsmpMsg, queue);
             }
             br.close();
-            //sets message content.
-            //jcsmpMsg.setText(msg);
 
             //sets persistent delivery mode.
             //persistent(Guaranteed message) , sends message even if receiver is offline.
             //keeps copy until successfully deliverd.
             jcsmpMsg.setDeliveryMode(DeliveryMode.PERSISTENT);
-
-            //log.info("============= Sending " + msg);
-            //prod.send(jcsmpMsg, topic);
 
         }
     }
