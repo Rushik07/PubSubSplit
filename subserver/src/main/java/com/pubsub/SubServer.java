@@ -32,6 +32,7 @@ public class SubServer {
         @Autowired(required=false) private JCSMPProperties jcsmpProperties;
 
         private DemoMessageConsumer msgConsumer = new DemoMessageConsumer();
+
         public void run(String... strings) throws Exception {
 
             final JCSMPSession session = solaceFactory.createSession();
@@ -63,13 +64,16 @@ public class SubServer {
             try {
                 // block here until message received, and latch will flip.
                 msgConsumer.getLatch().await(100, TimeUnit.SECONDS);
+
             } catch (InterruptedException e) {
                 log.error("I was awoken while waiting``");
             }
-            
-            // Close consumer
 
+
+            // Close consumer
             cons.close();
+            //Close File
+            msgConsumer.CloseFile();
             log.info("Exiting.");
             session.closeSession();
         }

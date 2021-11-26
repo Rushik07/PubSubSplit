@@ -24,6 +24,9 @@ import com.solacesystems.jcsmp.TextMessage;
 import com.solacesystems.jcsmp.XMLMessageListener;
 import lombok.extern.apachecommons.CommonsLog;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 @CommonsLog
@@ -31,6 +34,16 @@ import java.util.concurrent.CountDownLatch;
 public class DemoMessageConsumer implements XMLMessageListener {
     //CountDownLatch here is used for thread sychronization.
     private CountDownLatch latch = new CountDownLatch(9);
+    private BufferedWriter bw;
+
+    {
+        try {
+            bw = new BufferedWriter(new FileWriter("C:\\Users\\Rshkpatel\\Desktop\\Subdemo.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // Logging is done here.
     //BytesXMLMessage describe a messages that are sent or received.
@@ -38,19 +51,35 @@ public class DemoMessageConsumer implements XMLMessageListener {
     public void onReceive(BytesXMLMessage msg) {
         //TextMessage is used to send a message containing text.
         //Here we can have java code to write msg in a file.
+
         if (msg instanceof TextMessage) {
+            try {
+                bw.append(((TextMessage) msg).getText());
+                bw.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             log.info("============= TextMessage received: " + ((TextMessage) msg).getText());
         } else {
             log.info("============= Message received.");
         }
-        msg.ackMessage();
-        latch.countDown();
-    }
 
+        latch.countDown();
+        msg.ackMessage();
+
+    }
 
     public void onException(JCSMPException e) {
         log.info("Consumer received exception:", e);
         latch.countDown(); // unblock main thread
+    }
+    public void CloseFile(){
+        try {
+            bw.close();
+            log.info("Closed file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public CountDownLatch getLatch() {

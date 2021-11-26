@@ -30,7 +30,7 @@
 
 #### Task 2.1 - Building project.
 * Build a spring project with maven dependencies and Lombok.
-* Understand basics about Spring, Maven and Lombok with their uses.
+* Understand basics about Spring, Maven, and Lombok with their uses.
 #### Task 2.2 - Different Java classes.
 * Make main Java class for PubSubApplication for subscribing to the topic and sending a message to the topic.
 * Have PubEventHandler class to keep a check if the message was received else throw an error.
@@ -68,7 +68,13 @@
 * **Note:** Files should maintain the line-by-line ordering of text.
 #### Task 4.1 - Pub Server
 * We will change our Pubserver.java code by adding a BufferedReader to read content from the demo.txt file.
-*
+* We will read a single line and publish it from Pubserver class.
+* Now the message queue will contain a message from file the file in an orderly manner.
+#### Task 4.1 -Sub Server
+* SubSever class will have BufferedWriter to write text to the output stream.
+* We will read a message from the message queue and append it into a new text file Subdemo.txt.
+* We will close the stream by calling msgConsumer.CloseFile() method from Sub server side.
+* Final Output will have a Subdemo file filed with content in an orderly manner.
 
 
 
@@ -86,3 +92,10 @@
 * **Note -** On the Subscriber side we will use ConsumerFlowProperties which is used to :
   * Create a flow.
   * Bind to and consume messages from the Queue.
+
+### Final Working of PUb-Sub (Spilt) Project.
+* We will have a publisher server starting a session and using a Queue to send events/messages.
+  * Messages will be read from a file and sent on a Queue.
+* Publisher server will connect to the same session and read messages from the Queue.
+  * These messages will be stored in a text file.
+* We will check if both the files will have the same content or not.
