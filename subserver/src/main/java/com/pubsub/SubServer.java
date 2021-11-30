@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
@@ -19,13 +20,16 @@ public class SubServer {
         SpringApplication.run(SubServer.class, args);
     }
 
+
     @Component
     static class Runner implements CommandLineRunner {
         //JCMPFactory is used to obtain instances of messaging system entities. Creating topic as well.
         //private final Topic topic = JCSMPFactory.onlyInstance().createTopic("tutorial/topic");
         private final Queue queue = JCSMPFactory.onlyInstance().createQueue("DemoQueue");
+
         @Autowired
         private SpringJCSMPFactory solaceFactory;
+
         // Examples of other beans that can be used together to generate a customized SpringJCSMPFactory
         @Autowired(required=false) private SpringJCSMPFactoryCloudFactory springJCSMPFactoryCloudFactory;
         @Autowired(required=false) private SolaceServiceCredentials solaceServiceCredentials;
@@ -59,17 +63,17 @@ public class SubServer {
             //start receiving message
             cons.start();
             // Consumer session is now hooked up and running!
+            String CheckNum = "101";
 
             /** Anonymous inner-class for handling publishing events */
             try {
                 // block here until message received, and latch will flip.
                 msgConsumer.getLatch().await(100, TimeUnit.SECONDS);
+                msgConsumer.onReceive(CheckNum.getBytes());
 
             } catch (InterruptedException e) {
                 log.error("I was awoken while waiting``");
             }
-
-
             // Close consumer
             cons.close();
             //Close File
@@ -77,6 +81,8 @@ public class SubServer {
             log.info("Exiting.");
             session.closeSession();
         }
+
+
     }
 
 }

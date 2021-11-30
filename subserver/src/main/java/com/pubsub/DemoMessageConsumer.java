@@ -18,11 +18,9 @@
  */
 package com.pubsub;
 
-import com.solacesystems.jcsmp.BytesXMLMessage;
-import com.solacesystems.jcsmp.JCSMPException;
-import com.solacesystems.jcsmp.TextMessage;
-import com.solacesystems.jcsmp.XMLMessageListener;
+import com.solacesystems.jcsmp.*;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -30,12 +28,13 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 @CommonsLog
+@Component
 //XMLMessageListener is used to receive messages asynchronously.
 public class DemoMessageConsumer implements XMLMessageListener {
-    //CountDownLatch here is used for thread sychronization.
-    private CountDownLatch latch = new CountDownLatch(9);
-    private BufferedWriter bw;
 
+    //CountDownLatch here is used for thread sychronization.
+    private CountDownLatch latch = new CountDownLatch(10);
+    private BufferedWriter bw;
     {
         try {
             bw = new BufferedWriter(new FileWriter("C:\\Users\\Rshkpatel\\Desktop\\Subdemo.txt"));
@@ -47,15 +46,24 @@ public class DemoMessageConsumer implements XMLMessageListener {
 
     // Logging is done here.
     //BytesXMLMessage describe a messages that are sent or received.
-
+    int flag=0;
     public void onReceive(BytesXMLMessage msg) {
         //TextMessage is used to send a message containing text.
         //Here we can have java code to write msg in a file.
 
+
         if (msg instanceof TextMessage) {
+
             try {
-                bw.append(((TextMessage) msg).getText());
-                bw.newLine();
+                if(((TextMessage) msg).getText().equals("101") ){
+
+
+                }
+                else{
+                    bw.append(((TextMessage) msg).getText());
+                    //log.info("appended "+ ((TextMessage) msg).getText());
+                    bw.newLine();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -66,8 +74,8 @@ public class DemoMessageConsumer implements XMLMessageListener {
 
         latch.countDown();
         msg.ackMessage();
-
     }
+
 
     public void onException(JCSMPException e) {
         log.info("Consumer received exception:", e);
@@ -76,7 +84,7 @@ public class DemoMessageConsumer implements XMLMessageListener {
     public void CloseFile(){
         try {
             bw.close();
-            log.info("Closed file.");
+            log.info("Subdemo.txt file closed.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,5 +93,4 @@ public class DemoMessageConsumer implements XMLMessageListener {
     public CountDownLatch getLatch() {
         return latch;
     }
-
 }
