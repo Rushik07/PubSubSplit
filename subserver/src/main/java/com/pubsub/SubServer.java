@@ -9,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
@@ -63,14 +62,10 @@ public class SubServer {
             //start receiving message
             cons.start();
             // Consumer session is now hooked up and running!
-            String CheckNum = "101";
-
             /** Anonymous inner-class for handling publishing events */
-            try {
+             try {
                 // block here until message received, and latch will flip.
-                msgConsumer.getLatch().await(100, TimeUnit.SECONDS);
-                msgConsumer.onReceive(CheckNum.getBytes());
-
+                msgConsumer.getLatch().await(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 log.error("I was awoken while waiting``");
             }

@@ -18,7 +18,10 @@
  */
 package com.pubsub;
 
-import com.solacesystems.jcsmp.*;
+import com.solacesystems.jcsmp.BytesXMLMessage;
+import com.solacesystems.jcsmp.JCSMPException;
+import com.solacesystems.jcsmp.TextMessage;
+import com.solacesystems.jcsmp.XMLMessageListener;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +38,7 @@ public class DemoMessageConsumer implements XMLMessageListener {
     //CountDownLatch here is used for thread sychronization.
     private CountDownLatch latch = new CountDownLatch(10);
     private BufferedWriter bw;
+    private boolean aborted;
     {
         try {
             bw = new BufferedWriter(new FileWriter("C:\\Users\\Rshkpatel\\Desktop\\Subdemo.txt"));
@@ -44,26 +48,29 @@ public class DemoMessageConsumer implements XMLMessageListener {
     }
 
 
+
     // Logging is done here.
     //BytesXMLMessage describe a messages that are sent or received.
-    int flag=0;
     public void onReceive(BytesXMLMessage msg) {
         //TextMessage is used to send a message containing text.
         //Here we can have java code to write msg in a file.
 
-
         if (msg instanceof TextMessage) {
-
             try {
-                if(((TextMessage) msg).getText().equals("101") ){
-
-
+                if(((TextMessage) msg).getText().equals("101")){
+                    log.info("101 was found.us");
+                    try {
+                        await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else{
                     bw.append(((TextMessage) msg).getText());
                     //log.info("appended "+ ((TextMessage) msg).getText());
                     bw.newLine();
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -75,11 +82,30 @@ public class DemoMessageConsumer implements XMLMessageListener {
         latch.countDown();
         msg.ackMessage();
     }
+    /*public boolean check(String msg){
+        if(msg == "101"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }*/
 
+    public void await() throws InterruptedException {
+        latch.await();
+        if (aborted) {
+            try {
+                throw new AbortedException();
+            } catch (AbortedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void onException(JCSMPException e) {
         log.info("Consumer received exception:", e);
-        latch.countDown(); // unblock main thread
+        latch.countDown();// unblock main thread
+
     }
     public void CloseFile(){
         try {
@@ -93,4 +119,14 @@ public class DemoMessageConsumer implements XMLMessageListener {
     public CountDownLatch getLatch() {
         return latch;
     }
+
+    public static class AbortedException extends InterruptedException {
+        public AbortedException() {
+        }
+
+        public AbortedException(String detailMessage) {
+            super(detailMessage);
+        }
+    }
+
 }
