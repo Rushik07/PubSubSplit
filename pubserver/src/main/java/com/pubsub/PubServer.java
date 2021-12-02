@@ -10,8 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 
 @SpringBootApplication
 @CommonsLog
@@ -25,8 +24,8 @@ public class PubServer {
     static class Runner implements CommandLineRunner {
 
         //JCMPFactory is used to obtain instances of messaging system entities. Creating topic as well.
-        //private final Topic topic = JCSMPFactory.onlyInstance().createTopic("tutorial/topic");
-        private final Queue queue = JCSMPFactory.onlyInstance().createQueue("DemoQueue");
+        private final Topic topic = JCSMPFactory.onlyInstance().createTopic("pub");
+        //private final Queue queue = JCSMPFactory.onlyInstance().createQueue("DemoQueue");
         @Autowired
         private SpringJCSMPFactory solaceFactory;
 
@@ -43,11 +42,11 @@ public class PubServer {
 
             final JCSMPSession session = solaceFactory.createSession();
 
-            final EndpointProperties endpointProps = new EndpointProperties();
-            endpointProps.setPermission(EndpointProperties.PERMISSION_CONSUME);
-            endpointProps.setAccessType(EndpointProperties.ACCESSTYPE_EXCLUSIVE);
-
-            session.provision(queue, endpointProps, JCSMPSession.FLAG_IGNORE_ALREADY_EXISTS);
+            //final EndpointProperties endpointProps = new EndpointProperties();
+            //endpointProps.setPermission(EndpointProperties.PERMISSION_CONSUME);
+            //endpointProps.setAccessType(EndpointProperties.ACCESSTYPE_EXCLUSIVE);
+            session.addSubscription(topic);
+            //session.provision(queue, endpointProps, JCSMPSession.FLAG_IGNORE_ALREADY_EXISTS);
 
             //adds a subscription to the appliance.
             // Consumer session is now hooked up and running!
@@ -58,15 +57,17 @@ public class PubServer {
             //Creates a message instance tied to that producer.
 
             TextMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
-
-            BufferedReader br = new BufferedReader(new FileReader( "C:\\Users\\Rshkpatel\\Desktop\\demo.txt"));
-            String msg;
-            while((msg=br.readLine()) != null){
-                jcsmpMsg.setText(msg);
-                log.info("============= Sending " + msg);
-                prod.send(jcsmpMsg, queue);
+            byte[] buffer = new byte[1024];
+            FileInputStream in = new FileInputStream("C:\\Users\\Rshkpatel\\Desktop\\Sample.txt");
+            int readContent= in.read(buffer);
+            //String msg;
+            while(readContent != -1){
+                readContent = in.read(buffer);
+                jcsmpMsg.setText(String.valueOf(readContent));
+                log.info("============= Sending " + String.valueOf(readContent));
+                prod.send(jcsmpMsg, topic);
             }
-            br.close();
+            in.close();
 
             //sets persistent delivery mode.
             //persistent(Guaranteed message) , sends message even if receiver is offline.

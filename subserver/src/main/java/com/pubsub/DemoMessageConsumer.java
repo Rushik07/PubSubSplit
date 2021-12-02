@@ -57,8 +57,8 @@ public class DemoMessageConsumer implements XMLMessageListener {
 
         if (msg instanceof TextMessage) {
             try {
-                if(((TextMessage) msg).getText().equals("101")){
-                    log.info("101 was found.us");
+                if(((TextMessage) msg).getText().equals("Error")){
+                    log.warn("Error was found.");
                     try {
                         await();
                     } catch (InterruptedException e) {
@@ -103,7 +103,7 @@ public class DemoMessageConsumer implements XMLMessageListener {
     }
 
     public void onException(JCSMPException e) {
-        log.info("Consumer received exception:", e);
+        log.error("Consumer received exception:", e);
         latch.countDown();// unblock main thread
 
     }
@@ -122,10 +122,11 @@ public class DemoMessageConsumer implements XMLMessageListener {
 
     public static class AbortedException extends InterruptedException {
         public AbortedException() {
+
         }
 
         public AbortedException(String detailMessage) {
-            super(detailMessage);
+          super(detailMessage);
         }
     }
 
